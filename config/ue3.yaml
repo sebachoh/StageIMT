@@ -1,0 +1,79 @@
+# 1. Identificación del Suscriptor
+supi: 'imsi-208950000000003'
+mcc: '208'
+mnc: '95'
+
+# 2. Llaves de Seguridad
+key: 'fee50c25709fb1d246671874391e29d5'
+op: '073a59c280a31d4385428841ea0a6bc3'
+opType: 'OPC'
+
+# 3. Identificadores de Equipo
+amf: '8000'
+imei: '356938035643803'
+imeiSv: '4370816125816151'
+
+# 4. Búsqueda de la Antena (gNB 2)
+gnbSearchList:
+  - 192.168.71.202
+
+# 5. Sesión PDU apuntando a Slice 3 (SST: 3, SD: 3)
+sessions:
+  - type: 'IPv4'
+    apn: 'oai'
+    slice:
+      sst: 3
+      sd: 3
+
+sliceSelection:
+  - sst: 3
+    sd: 3
+
+# 6. Configuraciones de Slicing (NSSAI)
+configured-nssai:
+  - sst: 3
+    sd: 3
+
+default-nssai:
+  - sst: 3
+    sd: 3
+
+# 7. Algoritmos de Integridad y Cifrado
+integrity:
+  IA1: true
+  IA2: true
+  IA3: true
+  IA0: true
+ciphering:
+  EA1: true
+  EA2: true
+  EA3: true
+  EA0: true
+integrity5G:
+  NIA1: true
+  NIA2: true
+  NIA3: true
+  NIA0: true
+ciphering5G:
+  NEA1: true
+  NEA2: true
+  NEA3: true
+  NEA0: true
+
+# 8. Tasa máxima de integridad
+integrityMaxRate:
+  uplink: 'full'
+  downlink: 'full'
+
+# 9. Control de Acceso Unificado (UAC)
+uacAic:
+  mps: false
+  mcs: false
+
+uacAcc:
+  normalClass: 0
+  class11: false
+  class12: false
+  class13: false
+  class14: false
+  class15: false

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Télémétrie Ambulance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        beige: {
+                            50: '#FDFBF7',
+                            100: '#F9F6F0',
+                            200: '#F2EBE0',
+                        },
+                        apple: {
+                            gray: '#86868b',
+                            dark: '#1d1d1f',
+                            red: '#ff3b30',
+                            blue: '#007aff',
+                            green: '#34c759'
+                        }
+                    },
+                    boxShadow: {
+                        'apple': '0 4px 24px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-beige-50 text-apple-dark antialiased min-h-screen p-6 md:p-10 tracking-tight">
+
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tighter text-apple-dark">Ambulance</h1>
+            <p class="text-apple-gray font-medium tracking-tight mt-1">Télémétrie en temps réel 5G</p>
+        </div>
+        <div class="flex gap-3">
+            <span class="bg-white text-apple-dark border border-gray-100 px-4 py-1.5 rounded-full text-xs font-semibold tracking-tight shadow-sm">Slice 1: Vidéo eMBB</span>
+            <span class="bg-white text-apple-dark border border-gray-100 px-4 py-1.5 rounded-full text-xs font-semibold tracking-tight shadow-sm">Slice 3: Capteurs mMTC</span>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Video Section (Left / Main) -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            <div class="bg-white rounded-[2rem] p-6 shadow-apple border border-gray-50 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold tracking-tight text-apple-dark">Caméra Principale</h2>
+                    <div id="rec-indicator" class="flex items-center gap-2 bg-red-50 text-apple-red px-3 py-1 rounded-full text-xs font-bold tracking-tight">
+                        <span class="w-2 h-2 rounded-full bg-apple-red animate-pulse"></span>
+                        EN DIRECT
+                    </div>
+                </div>
+                
+                <div class="relative rounded-2xl overflow-hidden bg-black flex-1 min-h-[300px] shadow-inner group">
+                    <video id="videoElement" class="absolute inset-0 w-full h-full object-cover" autoplay muted></video>
+                    
+                    <!-- Controls Overlay -->
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <button id="pauseBtn" onclick="togglePlay()" class="bg-white/90 backdrop-blur-md text-apple-dark px-6 py-3 rounded-full font-semibold tracking-tight shadow-lg hover:scale-105 transition-transform">
+                            Pause
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vitals Section (Right) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Vitals Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                
+                <!-- Heart Rate -->
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-gray-50 relative overflow-hidden">
+                    <div class="text-sm font-medium text-apple-gray mb-1 tracking-tight">Fréquence Cardiaque</div>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span id="val-hr" class="text-5xl font-bold tracking-tighter text-apple-red heartbeat-anim">--</span>
+                        <span class="text-lg font-semibold text-apple-gray tracking-tight">bpm</span>
+                    </div>
+                    <div class="absolute top-6 right-6 opacity-10">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-red"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- SpO2 -->
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-gray-50 relative overflow-hidden">
+                    <div class="text-sm font-medium text-apple-gray mb-1 tracking-tight">Saturation O2</div>
+                    <div class="flex items-baseline gap-1 mt-2">
+                        <span id="val-spo2" class="text-5xl font-bold tracking-tighter text-apple-blue">--</span>
+                        <span class="text-lg font-semibold text-apple-gray tracking-tight">%</span>
+                    </div>
+                    <div class="absolute top-6 right-6 opacity-10">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-blue"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Blood Pressure -->
+                <div class="bg-white rounded-3xl p-6 shadow-apple border border-gray-50 col-span-2 relative overflow-hidden">
+                    <div class="text-sm font-medium text-apple-gray mb-1 tracking-tight">Pression Artérielle (Sys/Dia)</div>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <span id="val-bp" class="text-5xl font-bold tracking-tighter text-apple-dark">--/--</span>
+                        <span class="text-lg font-semibold text-apple-gray tracking-tight">mmHg</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Chart -->
+            <div class="bg-white rounded-[2rem] p-6 shadow-apple border border-gray-50 flex-1 flex flex-col min-h-[250px]">
+                <h2 class="text-sm font-semibold tracking-tight text-apple-gray mb-4 uppercase">Tendance</h2>
+                <div class="flex-1 relative w-full h-full">
+                    <canvas id="hrChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.6.2/flv.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

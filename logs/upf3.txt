@@ -1,0 +1,36 @@
+  vpp-upf-slice3:
+    image: oaisoftwarealliance/oai-upf-vpp:v1.5.0
+    privileged: true
+    container_name: "vpp-upf-slice3"
+    volumes:
+      - ./config/upf_entrypoint.sh:/openair-upf/bin/entrypoint.sh:ro
+    environment:
+      - NAME=AUPF3
+      - MNC=95
+      - MCC=208
+      - REALM=3gppnetwork.org
+      - IF_1_IP=192.168.70.123
+      - IF_1_TYPE=N4
+      - IF_2_IP=192.168.72.123
+      - IF_2_TYPE=N3
+      - IF_2_NWI=access.5gcn.mnc95.mcc208.3gppnetwork.org
+      - IF_2_DNAI=access
+      - IF_3_IP=192.168.73.123
+      - IF_3_TYPE=N6
+      - IF_3_NWI=internet.5gcn.mnc95.mcc208.3gppnetwork.org
+      - IF_3_DNAI=ext-dn3
+      - VPP_MAIN_CORE=0
+      - VPP_CORE_WORKER=1
+      - VPP_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/vpp_plugins/
+      - SNSSAI_SST=3
+      - SNSSAI_SD=3
+      - DNN=oai
+      - REGISTER_NRF=yes
+      - NRF_IP_ADDR=192.168.70.103
+      - NRF_PORT=80
+      - HTTP_VERSION=1
+    networks:
+      common-control-network:
+        ipv4_address: 192.168.70.123
+      inter-upf-transit-network:
+        ipv4_address: 192.168.72.123

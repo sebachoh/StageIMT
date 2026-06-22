@@ -1,0 +1,59 @@
+info:
+  version: 1.4.0
+  description: OAI-NSSF Customized for 4 Slices
+configuration:
+  nsiInfoList:
+    - snssai:
+        sst: 1
+        sd: '000001'
+      nsiInformationList:
+        nrfId: http://192.168.70.101:80/nnrf-disc/v1/nf-instances
+    - snssai:
+        sst: 2
+        sd: '000002'
+      nsiInformationList:
+        nrfId: http://192.168.70.102:80/nnrf-disc/v1/nf-instances
+    - snssai:
+        sst: 3
+        sd: '000003'
+      nsiInformationList:
+        nrfId: http://192.168.70.103:80/nnrf-disc/v1/nf-instances
+    - snssai:
+        sst: 4
+        sd: '000004'
+      nsiInformationList:
+        nrfId: http://192.168.70.104:80/nnrf-disc/v1/nf-instances
+  taInfoList:
+    - tai:
+        plmnId:
+          mcc: '208'
+          mnc: '95'
+        tac: '33456'
+      supportedSnssaiList:
+        - sst: 1
+          sd: '000001'
+        - sst: 2
+          sd: '000002'
+        - sst: 3
+          sd: '000003'
+        - sst: 4
+          sd: '000004'
+  amfInfoList:
+    - targetAmfSet: oai5gcn.mcc208.mnc95.regionid128.setid1.3gppnetwork.org
+      amfList:
+        - nfId: 405e8251-cc5a-45dd-a494-efb9eaf1cd58
+          supportedNssaiAvailabilityData:
+            tai:
+              plmnId:
+                mcc: 208
+                mnc: 95
+              tac: 33456
+            supportedSnssaiList:
+              - sst: 1
+                sd: '000001'
+              - sst: 2
+                sd: '000002'
+              - sst: 3
+                sd: '000003'
+              - sst: 4
+                sd: '000004'
