@@ -37,6 +37,68 @@ function initPlayer(element, streamName, offlineId) {
 const player1 = initPlayer(videoElement1, 'camera', 'offline-cam1');
 const player2 = initPlayer(videoElement2, 'camera2', 'offline-cam2');
 
+// --- Panning Logic for Video Elements ---
+function makePannable(videoElement, handleElement) {
+    let isDragging = false;
+    let startX, startY;
+    let objX = 50, objY = 50; // default centered
+
+    videoElement.style.objectPosition = `${objX}% ${objY}%`;
+    handleElement.style.touchAction = 'none'; // Prevent page scrolling on touch
+
+    const startDrag = (x, y) => {
+        isDragging = true;
+        startX = x;
+        startY = y;
+        handleElement.style.cursor = 'grabbing';
+    };
+
+    const doDrag = (x, y) => {
+        if (!isDragging) return;
+        const dx = x - startX;
+        const dy = y - startY;
+        startX = x;
+        startY = y;
+        
+        // Dragging logic: drag left reveals right content (increases X%)
+        const factor = 0.15; 
+        objX -= dx * factor;
+        objY -= dy * factor;
+
+        // Clamp values between 0% and 100%
+        objX = Math.max(0, Math.min(100, objX));
+        objY = Math.max(0, Math.min(100, objY));
+
+        videoElement.style.objectPosition = `${objX}% ${objY}%`;
+    };
+
+    const endDrag = () => {
+        if (isDragging) {
+            isDragging = false;
+            handleElement.style.cursor = 'grab';
+        }
+    };
+
+    // Mouse events
+    handleElement.addEventListener('mousedown', (e) => {
+        e.stopPropagation(); // prevent triggering pause overlay if it bubbled
+        startDrag(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => doDrag(e.clientX, e.clientY));
+    window.addEventListener('mouseup', endDrag);
+
+    // Touch events
+    handleElement.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        startDrag(e.touches[0].clientX, e.touches[0].clientY);
+    });
+    window.addEventListener('touchmove', (e) => doDrag(e.touches[0].clientX, e.touches[0].clientY));
+    window.addEventListener('touchend', endDrag);
+}
+
+makePannable(videoElement1, document.getElementById('drag-handle-cam1'));
+makePannable(videoElement2, document.getElementById('drag-handle-cam2'));
+
 const pauseBtn = document.getElementById('pauseBtn');
 const recIndicator = document.getElementById('rec-indicator');
 
@@ -61,6 +123,8 @@ function setLayout(layout) {
     const btn1 = document.getElementById('btn-cam1');
     const btn2 = document.getElementById('btn-cam2');
     const btnSplit = document.getElementById('btn-split');
+    const handle1 = document.getElementById('drag-handle-cam1');
+    const handle2 = document.getElementById('drag-handle-cam2');
 
     // Reset buttons
     [btn1, btn2, btnSplit].forEach(btn => {
@@ -71,14 +135,20 @@ function setLayout(layout) {
         cont1.style.display = 'block';
         cont2.style.display = 'none';
         btn1.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
+        handle1.style.display = 'none';
+        handle2.style.display = 'none';
     } else if (layout === 'cam2') {
         cont1.style.display = 'none';
         cont2.style.display = 'block';
         btn2.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
+        handle1.style.display = 'none';
+        handle2.style.display = 'none';
     } else if (layout === 'split') {
         cont1.style.display = 'block';
         cont2.style.display = 'block';
         btnSplit.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
+        handle1.style.display = 'block';
+        handle2.style.display = 'block';
     }
 }
 
