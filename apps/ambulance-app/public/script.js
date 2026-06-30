@@ -1,32 +1,84 @@
 // Setup Video FLV (Real stream from 5G network)
-const videoElement = document.getElementById('videoElement');
-try {
-    if (typeof flvjs !== 'undefined' && flvjs.isSupported()) {
-        let flvPlayer = flvjs.createPlayer({
-            type: 'flv',
-            url: `http://${window.location.hostname}:8001/live/camera.flv`
-        });
-        flvPlayer.attachMediaElement(videoElement);
-        flvPlayer.load();
-        flvPlayer.play().catch(e => console.log("Auto-play prevented"));
-    } else {
-        console.warn("FLV.js is not supported or failed to load");
+const videoElement1 = document.getElementById('videoElement1');
+const videoElement2 = document.getElementById('videoElement2');
+
+function initPlayer(element, streamName, offlineId) {
+    const offlineMsg = document.getElementById(offlineId);
+    try {
+        if (typeof flvjs !== 'undefined' && flvjs.isSupported()) {
+            let flvPlayer = flvjs.createPlayer({
+                type: 'flv',
+                url: `http://${window.location.hostname}:8001/live/${streamName}.flv`
+            });
+            flvPlayer.attachMediaElement(element);
+            flvPlayer.load();
+            
+            // Hide offline message when video receives data
+            flvPlayer.on(flvjs.Events.STATISTICS_INFO, function() {
+                if(offlineMsg) offlineMsg.style.display = 'none';
+            });
+            
+            flvPlayer.on(flvjs.Events.ERROR, (errType, errDetail) => {
+                console.log(`Error on ${streamName}:`, errType, errDetail);
+                if(offlineMsg) offlineMsg.style.display = 'flex';
+            });
+
+            flvPlayer.play().catch(e => console.log(`Auto-play prevented for ${streamName}`));
+            return flvPlayer;
+        } else {
+            console.warn("FLV.js is not supported or failed to load");
+        }
+    } catch (error) {
+        console.error("Error setting up video:", error);
     }
-} catch (error) {
-    console.error("Error setting up video:", error);
+    return null;
 }
+
+const player1 = initPlayer(videoElement1, 'camera', 'offline-cam1');
+const player2 = initPlayer(videoElement2, 'camera2', 'offline-cam2');
 
 const pauseBtn = document.getElementById('pauseBtn');
 const recIndicator = document.getElementById('rec-indicator');
+
 function togglePlay() {
-    if (videoElement.paused) {
-        videoElement.play();
+    if (videoElement1.paused || videoElement2.paused) {
+        videoElement1.play().catch(e=>{});
+        videoElement2.play().catch(e=>{});
         pauseBtn.innerText = "⏸ PAUSE";
-        recIndicator.style.display = "block";
+        recIndicator.style.display = "flex";
     } else {
-        videoElement.pause();
+        videoElement1.pause();
+        videoElement2.pause();
         pauseBtn.innerText = "▶ REPRENDRE";
         recIndicator.style.display = "none";
+    }
+}
+
+// Layout Switcher
+function setLayout(layout) {
+    const cont1 = document.getElementById('container-cam1');
+    const cont2 = document.getElementById('container-cam2');
+    const btn1 = document.getElementById('btn-cam1');
+    const btn2 = document.getElementById('btn-cam2');
+    const btnSplit = document.getElementById('btn-split');
+
+    // Reset buttons
+    [btn1, btn2, btnSplit].forEach(btn => {
+        btn.className = "px-3 py-1.5 text-xs font-semibold rounded-md text-apple-gray hover:text-apple-dark transition-all";
+    });
+
+    if (layout === 'cam1') {
+        cont1.style.display = 'block';
+        cont2.style.display = 'none';
+        btn1.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
+    } else if (layout === 'cam2') {
+        cont1.style.display = 'none';
+        cont2.style.display = 'block';
+        btn2.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
+    } else if (layout === 'split') {
+        cont1.style.display = 'block';
+        cont2.style.display = 'block';
+        btnSplit.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-white shadow-sm text-apple-dark transition-all";
     }
 }
 

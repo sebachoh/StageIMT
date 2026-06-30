@@ -1,5 +1,5 @@
 #!/bin/bash
-BROKER="192.168.73.101"
+BROKER="${1:-192.168.73.101}"
 
 echo "Instalando mosquitto-clients..."
 apt-get update > /dev/null

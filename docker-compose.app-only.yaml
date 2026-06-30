@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  iot-broker:
+    container_name: "local-iot-broker"
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  ambulance-server:
+    container_name: "local-ambulance-server"
+    build: ./apps/ambulance-app
+    ports:
+      - "3001:3001"
+      - "1935:1935"
+      - "8001:8000"
+    environment:
+      - MQTT_BROKER_URL=mqtt://iot-broker:1883
+    depends_on:
+      - iot-broker

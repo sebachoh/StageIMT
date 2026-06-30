@@ -9,8 +9,9 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-// Connect to IoT Broker on Slice 3 (192.168.73.101)
-const client = mqtt.connect('mqtt://192.168.73.101:1883');
+// Connect to IoT Broker on Slice 3 (192.168.73.101) or local environment variable
+const brokerUrl = process.env.MQTT_BROKER_URL || 'mqtt://192.168.73.101:1883';
+const client = mqtt.connect(brokerUrl);
 
 client.on('connect', () => {
     console.log('Connected to MQTT Broker on Slice 3');
