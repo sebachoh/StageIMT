@@ -18,5 +18,7 @@ services:
       - "8001:8000"
     environment:
       - MQTT_BROKER_URL=mqtt://iot-broker:1883
+    volumes:
+      - ./apps/ambulance-app/public:/app/public
     depends_on:
       - iot-broker

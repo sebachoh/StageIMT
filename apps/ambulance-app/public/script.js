@@ -104,6 +104,15 @@ const recIndicator = document.getElementById('rec-indicator');
 
 function togglePlay() {
     if (videoElement1.paused || videoElement2.paused) {
+        // Resincronizar al momento EN VIVO (saltar el búfer acumulado durante la pausa)
+        const syncToLive = (video) => {
+            if (video.buffered && video.buffered.length > 0) {
+                video.currentTime = video.buffered.end(video.buffered.length - 1) - 0.1;
+            }
+        };
+        syncToLive(videoElement1);
+        syncToLive(videoElement2);
+
         videoElement1.play().catch(e=>{});
         videoElement2.play().catch(e=>{});
         pauseBtn.innerText = "⏸ PAUSE";
